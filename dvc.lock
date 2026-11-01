@@ -1,0 +1,106 @@
+schema: '2.0'
+stages:
+  index:
+    cmd: python -m scripts.build_index --config A
+    deps:
+    - path: data/inventory.csv
+      hash: md5
+      md5: 7fa18e795525365f5da0b5463191ddcd
+      size: 1957
+    - path: data/raw
+      hash: md5
+      md5: 8d338dbe5b8664d46b1cb5d8477d776d.dir
+      size: 11819
+      nfiles: 11
+    - path: src/chunking.py
+      hash: md5
+      md5: 3205d4459dde324d136bc9032121b0b3
+      size: 1323
+    - path: src/clean.py
+      hash: md5
+      md5: 2b5b4e7c01dfa71e1890e93aed74d492
+      size: 2080
+    - path: src/embeddings.py
+      hash: md5
+      md5: 514bab64fe5d127170b49207dad2460e
+      size: 2638
+    - path: src/index.py
+      hash: md5
+      md5: fe614527d900194926a93e460aff0473
+      size: 980
+    - path: src/ingest.py
+      hash: md5
+      md5: 47a2878db05484a3f1c9f5188328641f
+      size: 1986
+    params:
+      params.yaml:
+        chunking:
+          active: A
+          configs:
+            A:
+              size: 60
+              overlap: 10
+            B:
+              size: 120
+              overlap: 20
+        corpus:
+          version: corpus-v1
+          raw_dir: data/raw
+          inventory: data/inventory.csv
+          users: data/users.yaml
+          processed_dir: data/processed
+          include_status:
+          - active
+        embeddings:
+          provider: hash
+          hash_dim: 512
+          st_model: paraphrase-multilingual-MiniLM-L12-v2
+        security.sanitize_at_ingest: true
+    outs:
+    - path: index/chroma
+      hash: md5
+      md5: b942ca350a31bc98ed5dba327d9217f1.dir
+      size: 592036
+      nfiles: 5
+  eval:
+    cmd: python -m scripts.run_eval --config A
+    deps:
+    - path: eval/questions.jsonl
+      hash: md5
+      md5: 3fabb1a88b6e5a1162390a88cb38ebad
+      size: 10157
+    - path: index/chroma
+      hash: md5
+      md5: 580b34ff56ea58c0214541ef10172260.dir
+      size: 840008
+      nfiles: 9
+    - path: src/evaluation.py
+      hash: md5
+      md5: a081ae24c95073017d47b737e8b8b339
+      size: 4446
+    - path: src/rag.py
+      hash: md5
+      md5: dd4ef3a20f1fd433a7ccc26e5c1e8ffb
+      size: 4438
+    - path: src/retriever.py
+      hash: md5
+      md5: 127e57700389807b4382255dc3c26454
+      size: 788
+    params:
+      params.yaml:
+        llm:
+          provider: extractive
+          model: <modele_autorise>
+          temperature: 0.0
+          timeout_s: 30
+          ollama_url: http://localhost:11434
+        retrieval:
+          top_k: 4
+          min_score:
+            hash: 0.15
+            sentence-transformers: 0.35
+    outs:
+    - path: eval/results/metrics.json
+      hash: md5
+      md5: 33d2c227aaf44be05e4b37f2a1b837d4
+      size: 344

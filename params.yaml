@@ -1,0 +1,55 @@
+# Source unique des parametres du projet. Tout changement ici doit etre trace (Git + MLflow).
+corpus:
+  version: "corpus-v1"
+  raw_dir: "data/raw"
+  inventory: "data/inventory.csv"
+  users: "data/users.yaml"
+  processed_dir: "data/processed"
+  include_status: ["active"]        # les documents obsoletes ne sont pas indexes
+
+chunking:
+  active: "A"
+  configs:
+    A: {size: 60, overlap: 10}      # en mots ; a augmenter avec un corpus reel (ex. 300 / 600)
+    B: {size: 120, overlap: 20}
+
+embeddings:
+  provider: "hash"                  # "hash" (deterministe, CI) ou "sentence-transformers"
+  hash_dim: 512
+  st_model: "paraphrase-multilingual-MiniLM-L12-v2"
+
+index:
+  dir: "index/chroma"
+  collection: "rag_banque"
+
+retrieval:
+  top_k: 4
+  min_score:                         # seuil de refus, a recalibrer pour chaque modele d'embeddings
+    hash: 0.15
+    sentence-transformers: 0.35
+
+llm:
+  provider: "extractive"            # "extractive" (sans API), "groq" ou "ollama"
+  model: "<modele_autorise>"        # ex. modele Groq autorise en TP, ou modele Ollama local
+  temperature: 0.0
+  timeout_s: 30
+  ollama_url: "http://localhost:11434"
+
+security:
+  sanitize_at_ingest: true          # retire les phrases d'injection avant l'indexation
+  sanitize_at_query: true           # defense en profondeur au moment de la requete
+
+logging:
+  requests_log: "logs/requests.jsonl"
+
+mlflow:
+  experiment: "rag-banque"
+
+quality_gate:
+  min_recall_at_k: 0.90         # baseline A = 1.00 moins une marge ; a durcir avec un corpus plus grand
+  min_refusal_accuracy: 0.90     # baseline A = 0.98 moins une marge
+  min_reference_validity: 1.0
+  max_access_violations: 0
+  max_forbidden_leaks: 0
+  max_regression: 0.05
+  max_p95_latency_ms: 2000

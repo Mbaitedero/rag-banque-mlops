@@ -1,0 +1,15 @@
+.venv/
+venv/
+TP4CICD/
+__pycache__/
+.pytest_cache/
+.coverage
+.env
+index/
+mlruns/
+mlartifacts/
+logs/
+data/processed/*
+!data/processed/.gitkeep
+.ruff_cache/
+mlflow.db

@@ -1,0 +1,33 @@
+# Pipeline reproductible : dvc repro   (necessite : pip install -r requirements-optional.txt)
+stages:
+  index:
+    cmd: python -m scripts.build_index --config A
+    deps:
+      - data/raw
+      - data/inventory.csv
+      - src/ingest.py
+      - src/clean.py
+      - src/chunking.py
+      - src/embeddings.py
+      - src/index.py
+    params:
+      - corpus
+      - chunking
+      - embeddings
+      - security.sanitize_at_ingest
+    outs:
+      - index/chroma
+  eval:
+    cmd: python -m scripts.run_eval --config A
+    deps:
+      - index/chroma
+      - eval/questions.jsonl
+      - src/rag.py
+      - src/retriever.py
+      - src/evaluation.py
+    params:
+      - retrieval
+      - llm
+    metrics:
+      - eval/results/metrics.json:
+          cache: false

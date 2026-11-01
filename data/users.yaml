@@ -1,0 +1,7 @@
+# Roles fictifs et niveaux d'acces documentaires autorises.
+# Principe : refus par defaut (un role absent de ce fichier n'a acces a rien).
+roles:
+  agent:
+    access_levels: [public]
+  conformite:
+    access_levels: [public, conformite]

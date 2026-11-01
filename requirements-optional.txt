@@ -1,0 +1,4 @@
+# Installe a la demande :
+#   pip install -r requirements-optional.txt
+sentence-transformers>=3.0
+dvc>=3.0

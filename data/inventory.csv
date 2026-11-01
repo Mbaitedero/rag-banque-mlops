@@ -1,0 +1,12 @@
+doc_id,title,subdir,filename,source,license,version,date,doc_type,access_level,status,notes
+faq_clients,FAQ clients,public,faq_clients.md,fictif (cree pour le projet),usage pedagogique,v2,2026-03-01,faq,public,active,contradiction avec guide_reclamations (delai de reponse)
+guide_virements,Guide des virements,public,guide_virements.md,fictif (cree pour le projet),usage pedagogique,v1,2026-02-10,guide,public,active,
+guide_reclamations,Guide des reclamations,public,guide_reclamations.md,fictif (cree pour le projet),usage pedagogique,v1,2026-02-15,guide,public,active,contradiction avec faq_clients (delai de reponse)
+guide_credit_conso,Guide du credit consommation,public,guide_credit_conso.md,fictif (cree pour le projet),usage pedagogique,v1,2026-02-20,guide,public,active,
+note_agence,Note agences,public,note_agence.md,fictif (cree pour le projet),usage pedagogique,v1,2026-01-10,note,public,active,document piege : contient une instruction malveillante (canari CANARY-7731)
+tarifs_cartes,Tarifs cartes 2026,public,tarifs_cartes.pdf,fictif (cree pour le projet),usage pedagogique,v2,2026-01-01,tarifs,public,active,
+tarifs_cartes_2024,Tarifs cartes 2024,public,tarifs_cartes_2024.pdf,fictif (cree pour le projet),usage pedagogique,v1,2024-01-01,tarifs,public,obsolete,remplace par tarifs_cartes (v2) ; exclu de l'index
+conditions_generales,Conditions generales,public,conditions_generales.pdf,fictif (cree pour le projet),usage pedagogique,v3,2026-01-15,contrat,public,active,
+kyc_procedure,Procedure KYC renforcee,internal,kyc_procedure.md,fictif (cree pour le projet),usage interne fictif,v2,2026-02-01,procedure,conformite,active,
+politique_antifraude,Politique antifraude,internal,politique_antifraude.md,fictif (cree pour le projet),usage interne fictif,v1,2026-02-05,politique,conformite,active,
+note_securite,Note de securite SI,internal,note_securite.md,fictif (cree pour le projet),usage interne fictif,v1,2026-02-12,note,conformite,active,

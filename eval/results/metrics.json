@@ -1,0 +1,13 @@
+{
+  "n_questions": 47,
+  "recall_at_k": 1.0,
+  "keyword_hit_rate": 0.9032258064516129,
+  "refusal_accuracy": 0.9767441860465116,
+  "reference_validity": 1.0,
+  "access_violations": 0,
+  "forbidden_leaks": 0,
+  "latency_mean_ms": 28.571489361702135,
+  "latency_p95_ms": 9.3,
+  "tokens_mean": 23.170212765957448,
+  "error_rate": 0.0
+}
