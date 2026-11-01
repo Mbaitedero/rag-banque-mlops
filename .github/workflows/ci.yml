@@ -14,12 +14,17 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  # ------------------------------------------------------------------
+  # 1. Qualité : lint, tests, couverture, sécurité (gates G1 à G8)
+  # ------------------------------------------------------------------
   quality:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout
+        uses: actions/checkout@v4
 
-      - uses: actions/setup-python@v5
+      - name: Setup Python
+        uses: actions/setup-python@v5
         with:
           python-version: "3.11"
           cache: "pip"
@@ -29,19 +34,17 @@ jobs:
           python -m pip install --upgrade pip setuptools
           pip install -r requirements.txt
 
-      - name: Lint (G1)
+      - name: Lint
         run: ruff check .
 
-      - name: Tests, data, provenance, access, injection, regression (G1-G6, G8)
+      - name: Tests (données, chunking, provenance, accès, injection, régression)
         run: pytest tests/ -v --cov=src --cov-report=term-missing --cov-fail-under=70
 
-      - name: Security - Bandit (G7)
+      - name: Security - Bandit
         run: bandit -r src scripts
 
-      # Exceptions documentees dans docs/risk_report.md (section "Exceptions pip-audit").
-      # PYSEC-2026-1845 : pytest (dependance de test). Les 4 identifiants chromadb sont a ANALYSER
-      # (lire les avis sur osv.dev) avant de garder cette exception.
-      - name: Security - pip-audit (G7)
+      # Exceptions à justifier dans docs/risk_report.md avant la remise.
+      - name: Security - pip-audit
         run: >
           pip-audit
           --ignore-vuln PYSEC-2026-1845
@@ -49,3 +52,85 @@ jobs:
           --ignore-vuln PYSEC-2026-3813
           --ignore-vuln PYSEC-2026-3814
           --ignore-vuln PYSEC-2026-3815
+
+  # ------------------------------------------------------------------
+  # 2. Development : build reproductible de l'index (develop et main)
+  # ------------------------------------------------------------------
+  development:
+    needs: quality
+    if: github.event_name == 'push' && (github.ref == 'refs/heads/develop' || github.ref == 'refs/heads/main')
+    runs-on: ubuntu-latest
+    environment: development
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: "pip"
+      - run: pip install -r requirements.txt
+
+      - name: Build index (config A)
+        run: python -m scripts.build_index --config A --no-mlflow
+
+      - name: Smoke test
+        run: python -m src.app --role agent --question "Quel est le plafond de retrait de la carte Premium ?"
+
+  # ------------------------------------------------------------------
+  # 3. Staging : évaluation complète + quality gates (main uniquement)
+  # ------------------------------------------------------------------
+  staging:
+    needs: development
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    environment: staging
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: "pip"
+      - run: pip install -r requirements.txt
+
+      - name: Evaluation (47 questions)
+        run: python -m scripts.run_eval --config A --no-mlflow
+
+      - name: Quality gates (échec si un gate échoue)
+        run: python -m scripts.promote --config A
+
+      - name: Archive les résultats
+        uses: actions/upload-artifact@v4
+        with:
+          name: eval-results
+          path: eval/results/
+
+  # ------------------------------------------------------------------
+  # 4. Production : promotion en champion (approbation humaine requise)
+  #    Configurer "Required reviewers" sur l'environnement production.
+  # ------------------------------------------------------------------
+  production:
+    needs: staging
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    environment: production
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: "pip"
+      - run: pip install -r requirements.txt
+
+      - name: Récupère les résultats validés en staging
+        uses: actions/download-artifact@v4
+        with:
+          name: eval-results
+          path: eval/results/
+
+      - name: Promotion en champion
+        run: python -m scripts.promote --config A --approve
+
+      - name: Archive la décision de promotion
+        uses: actions/upload-artifact@v4
+        with:
+          name: champion
+          path: eval/results/champion.json

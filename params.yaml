@@ -30,7 +30,7 @@ retrieval:
 
 llm:
   provider: "extractive"            # "extractive" (sans API), "groq" ou "ollama"
-  model: "<modele_autorise>"        # ex. modele Groq autorise en TP, ou modele Ollama local
+  model: "llama-3.1-8b-instant"        # ex. modele Groq autorise en TP, ou modele Ollama local
   temperature: 0.0
   timeout_s: 30
   ollama_url: "http://localhost:11434"
