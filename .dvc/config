@@ -1,4 +1,7 @@
 [core]
-    remote = localstore
+    remote = gdrive
 ['remote "localstore"']
     url = ../dvc-storerag-banque
+['remote "gdrive"']
+    url = gdrive://1PD_KLVP-PPHRhWtaK_qKAhRchEJFjzo6
+    gdrive_use_service_account = false

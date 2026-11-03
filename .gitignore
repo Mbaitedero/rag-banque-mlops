@@ -13,3 +13,5 @@ data/processed/*
 !data/processed/.gitkeep
 .ruff_cache/
 mlflow.db
+secrets/
+.dvc/config.local

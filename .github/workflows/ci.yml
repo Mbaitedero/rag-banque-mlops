@@ -34,13 +34,13 @@ jobs:
           python -m pip install --upgrade pip setuptools
           pip install -r requirements.txt
 
-      # AJOUTEZ CES DEUX ÉTAPES ICI
-      - name: Install DVC
-        run: pip install dvc  # Ajoutez les extraits nécessaires ex: dvc[s3] ou dvc[gdrive]
+      - name: Install DVC with Google Drive support
+        run: pip install "dvc[gdrive]"
 
       - name: Pull Data with DVC
         run: dvc pull data/raw.dvc
-      # ---------------------------------
+        env:
+          GDRIVE_CREDENTIALS_DATA: ${{ secrets.GDRIVE_CREDENTIALS_DATA }}
 
       - name: Lint
         run: ruff check .
