@@ -213,7 +213,7 @@ jobs:
           name: eval-results
           path: eval/results/
 
-  # 4. Production : promotion du modèle validé
+    # 4. Production : promotion du modèle validé
   production:
     needs: staging
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
@@ -231,6 +231,37 @@ jobs:
 
       - name: Install project dependencies
         run: python -m pip install -r requirements.txt
+
+      - name: Install DVC with compatible Google Drive dependencies
+        run: |
+          python -m pip install \
+            "dvc[gdrive]" \
+            "pyOpenSSL==24.2.1" \
+            "cryptography==43.0.3" \
+            "asyncssh==2.19.0"
+          python -m pip check
+
+      - name: Verify OpenSSL imports
+        run: |
+          python -c "from OpenSSL import crypto; print('OK: OpenSSL import succeeded')"
+
+      - name: Verify Google Drive secret
+        env:
+          GDRIVE_CREDENTIALS_DATA: ${{ secrets.GDRIVE_CREDENTIALS_DATA }}
+        run: |
+          if [ -z "$GDRIVE_CREDENTIALS_DATA" ]; then
+            echo "::error::GDRIVE_CREDENTIALS_DATA is absent or empty in production."
+            echo "Check Repository secrets and Environment secrets."
+            exit 1
+          fi
+
+          printf '%s' "$GDRIVE_CREDENTIALS_DATA" |
+            python -c "import json,sys; d=json.load(sys.stdin); assert isinstance(d,dict), 'JSON must be an object'; print('OK: secret is present and contains valid JSON')"
+
+      - name: Pull Data with DVC
+        env:
+          GDRIVE_CREDENTIALS_DATA: ${{ secrets.GDRIVE_CREDENTIALS_DATA }}
+        run: dvc pull data/raw.dvc
 
       - name: Download validated evaluation results
         uses: actions/download-artifact@v4
