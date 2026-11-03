@@ -36,8 +36,9 @@ jobs:
 
       - name: Install DVC with Google Drive support
         run: |
-          pip install "dvc[gdrive]"
-          pip check
+          python -m pip install "dvc[gdrive]"
+          python -m pip install --upgrade "pyOpenSSL>=24.0.0"
+          python -m pip check
 
       - name: Pull Data with DVC
         run: dvc pull data/raw.dvc
@@ -84,7 +85,10 @@ jobs:
         run: pip install -r requirements.txt
 
       - name: Install DVC with Google Drive support
-        run: pip install "dvc[gdrive]"
+        run: |
+          python -m pip install "dvc[gdrive]"
+          python -m pip install --upgrade "pyOpenSSL>=24.0.0"
+          python -m pip check
 
       - name: Pull Data with DVC
         run: dvc pull data/raw.dvc
@@ -119,7 +123,10 @@ jobs:
         run: pip install -r requirements.txt
 
       - name: Install DVC with Google Drive support
-        run: pip install "dvc[gdrive]"
+        run: |
+          python -m pip install "dvc[gdrive]"
+          python -m pip install --upgrade "pyOpenSSL>=24.0.0"
+          python -m pip check
 
       - name: Pull Data with DVC
         run: dvc pull data/raw.dvc
