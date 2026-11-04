@@ -69,8 +69,15 @@ jobs:
       - name: Lint
         run: ruff check .
 
-      - name: Tests
+      - name: Tests (repository branches and same-repository PRs)
+        if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository
         run: pytest tests/ -v --cov=src --cov-report=term-missing --cov-fail-under=70
+
+      - name: Tests (fork pull requests without DVC data)
+        if: github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name != github.repository
+        run: |
+          pytest tests/test_chunking.py -v
+          pytest tests/test_injection.py -v -k "sanitize_removes_injected_sentence or normal_text_is_untouched"
 
       - name: Security - Bandit
         run: bandit -r src scripts
@@ -214,6 +221,7 @@ jobs:
           path: eval/results/
 
     # 4. Production : promotion du modèle validé
+    # Required reviewers must be configured in the GitHub production environment.
   production:
     needs: staging
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
