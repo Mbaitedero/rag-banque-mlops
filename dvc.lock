@@ -71,7 +71,7 @@ stages:
       size: 10157
     - path: index/chroma
       hash: md5
-      md5: 580b34ff56ea58c0214541ef10172260.dir
+      md5: 1cee1638b061094146d0ebe8427acecf.dir
       size: 840008
       nfiles: 9
     - path: src/evaluation.py
@@ -90,7 +90,7 @@ stages:
       params.yaml:
         llm:
           provider: extractive
-          model: <modele_autorise>
+          model: llama-3.1-8b-instant
           temperature: 0.0
           timeout_s: 30
           ollama_url: http://localhost:11434
@@ -102,5 +102,5 @@ stages:
     outs:
     - path: eval/results/metrics.json
       hash: md5
-      md5: 33d2c227aaf44be05e4b37f2a1b837d4
-      size: 344
+      md5: 22ae8949945586b7020eadde1249492b
+      size: 343
