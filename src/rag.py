@@ -66,6 +66,7 @@ class RagPipeline:
             result.update(reason="erreur")
             event["error"] = f"{type(exc).__name__}: {exc}"
         result["latency_ms"] = round((time.perf_counter() - start) * 1000, 2)
+        result["request_id"] = event["request_id"]
         event.update(refused=result["refused"], reason=result["reason"], latency_ms=result["latency_ms"],
                      n_passages=len(result["context_chunk_ids"]), top_score=round(result["top_score"], 4),
                      flagged=result["flagged"], prompt_tokens=result["prompt_tokens"],
